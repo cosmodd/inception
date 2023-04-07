@@ -1,0 +1,10 @@
+[mysqld]
+# Disables DNS lookup
+skip-host-cache
+skip-name-resolve
+
+# Binds to all interfaces
+bind-address=0.0.0.0
+
+# Enables networking
+skip-networking=0
