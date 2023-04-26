@@ -1,5 +1,5 @@
 # Pull alpine image
-FROM alpine:3.17.2
+FROM alpine:3.16
 
 # Install needed packages
 RUN apk update && apk upgrade

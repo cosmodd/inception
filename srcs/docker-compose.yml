@@ -3,19 +3,58 @@ version: '3'
 services:
   nginx:
     container_name: nginx
-    build: ./requirements/nginx/
+    build:
+      context: ./requirements/nginx/
     env_file:
       - ./.env
     ports:
-      - '80:80'
       - '443:443'
     restart: unless-stopped
+    depends_on:
+      - wordpress
+    networks:
+      - inception
+    volumes:
+      - wp_volume:/var/www
 
   mariadb:
     container_name: mariadb
-    build: ./requirements/mariadb/
+    build:
+      context: ./requirements/mariadb/
     env_file:
       - ./.env
-    ports:
-      - '3306:3306'
     restart: unless-stopped
+    networks:
+      - inception
+
+  wordpress:
+    container_name: wordpress
+    build:
+      context: ./requirements/wordpress/
+    env_file:
+      - ./.env
+    restart: unless-stopped
+    depends_on:
+      - mariadb
+    networks:
+      - inception
+    volumes:
+      - wp_volume:/var/www
+
+volumes:
+  mariadb_volume:
+    driver_opts:
+      type: none
+      o: bind
+      device: /var/data/mariadb
+
+  wp_volume:
+    driver_opts:
+      type: none  # Type none defines a volume that is not managed by Docker
+      o: bind     # Bind mounts a file or directory from the host into the container
+      device: /var/data/wordpress
+
+networks:
+  inception:
+    # Bridge driver allows containers to communicate with each other
+    driver: bridge
