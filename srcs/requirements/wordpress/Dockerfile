@@ -21,7 +21,9 @@ RUN apk add --no-cache \
 	php${PHP_VERSION}-mbstring \
 	php${PHP_VERSION}-openssl \
 	php${PHP_VERSION}-xml \
-	php${PHP_VERSION}-zip
+	php${PHP_VERSION}-zip \
+	php${PHP_VERSION}-phar \
+	mariadb-client
 
 # Copy php-fpm pool configuration
 COPY ./conf/www.conf /etc/php${PHP_VERSION}/php-fpm.d/www.conf
@@ -32,7 +34,7 @@ RUN wget https://wordpress.org/${WORDPRESS_VERSION}.tar.gz
 RUN tar -xvf ${WORDPRESS_VERSION}.tar.gz
 RUN mv wordpress/* .
 RUN rm -rf wordpress ${WORDPRESS_VERSION}.tar.gz
-RUN chown -R 0777 /var/www
+RUN chmod -R 777 wp-content
 
 # Install wordpress-cli
 RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
@@ -40,7 +42,7 @@ RUN chmod +x wp-cli.phar
 RUN mv wp-cli.phar /usr/local/bin/wp
 
 # Copy entrypoint script
-COPY ./conf/wp_config.sh /tmp/wp_config.sh
+COPY ./scripts/wp_config.sh /tmp/wp_config.sh
 
 # Run php-fpm in foreground
 ENTRYPOINT [ "sh", "/tmp/wp_config.sh" ]

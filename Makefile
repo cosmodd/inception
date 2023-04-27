@@ -1,26 +1,35 @@
+# Binaries
+DOCKER			=	docker
+DOCKER_COMPOSE	=	docker compose
+
 # Paths
-DOCKER_COMPOSE	= ./srcs/docker-compose.yml
-ENV_FILE		= ./srcs/.env
-DATA_DIR		= /var/data/
+COMPOSE_FILE	=	./srcs/docker-compose.yml
+ENV_FILE		=	./srcs/.env
+DATA_DIR		=	~/data
 
 # Parameters
-DOCKER_PARAMS	= -f $(DOCKER_COMPOSE) --env-file $(ENV_FILE)
+DOCKER_PARAMS	=	-f $(COMPOSE_FILE) --env-file $(ENV_FILE)
 
-all:
-	@docker-compose $(DOCKER_PARAMS) up -d
+all: init-volumes
+	@${DOCKER_COMPOSE} $(DOCKER_PARAMS) up -d
 
-build:
-	@docker-compose $(DOCKER_PARAMS) up -d --build
+build: init-volumes
+	@${DOCKER_COMPOSE} $(DOCKER_PARAMS) up -d --build
+
+init-volumes:
+	@mkdir -p $(DATA_DIR)/mariadb
+	@mkdir -p $(DATA_DIR)/wordpress
 
 down:
-	@docker-compose $(DOCKER_PARAMS) down
+	@${DOCKER_COMPOSE} $(DOCKER_PARAMS) down
 
 re: down build
 
 clean:
-	@docker system prune -a
+	@${DOCKER} system prune -a
 
 fclean:
-	@docker system prune -a --volumes
+	@${DOCKER} system prune -a --volumes
+	@rm -rf $(DATA_DIR)
 
-.PHONY: all build down re clean fclean
+.PHONY: all build down re clean fclean init-volumes

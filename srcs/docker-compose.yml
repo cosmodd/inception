@@ -26,6 +26,8 @@ services:
     restart: unless-stopped
     networks:
       - inception
+    volumes:
+      - mariadb_volume:/var/lib/mysql
 
   wordpress:
     container_name: wordpress
@@ -46,13 +48,13 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /var/data/mariadb
+      device: ${HOME}/data/mariadb
 
   wp_volume:
     driver_opts:
       type: none  # Type none defines a volume that is not managed by Docker
       o: bind     # Bind mounts a file or directory from the host into the container
-      device: /var/data/wordpress
+      device: ${HOME}/data/wordpress
 
 networks:
   inception:

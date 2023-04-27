@@ -9,9 +9,9 @@ if [ ! -d /var/lib/mysql/mysql ]; then
 fi
 
 # Setup Wordpress database if it doesn't exist
-if [ ! -d /var/lib/mysql/wordpress ]; then
+if [ ! -d /var/lib/mysql/${DB_NAME} ]; then
 
-	echo "[INFO] Creating Wordpress database..."
+	echo "[INFO] Creating '${DB_NAME}' database..."
 
 	# Replace environment variables in SQL file
 	cp /tmp/wordpress.sql /tmp/wordpress.sql.tmp
@@ -19,9 +19,6 @@ if [ ! -d /var/lib/mysql/wordpress ]; then
 
 	# --bootstrap is used to execute the SQL commands without starting the server
 	/usr/bin/mysqld --user=mysql --bootstrap < /tmp/wordpress.sql
-
-	# Remove temporary file
-	rm -rf /tmp/wordpress.sql
 
 fi
 

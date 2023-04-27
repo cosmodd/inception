@@ -29,8 +29,8 @@ CREATE DATABASE ${DB_NAME} CHARACTER SET utf8 COLLATE utf8_general_ci;
 -- The user is granted access from any host (%)
 CREATE USER '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASS}';
 
--- Grant all privileges on the 'wordpress' database to the MySQL user created in the previous statement
-GRANT ALL PRIVILEGES ON wordpress.* TO '${DB_USER}'@'%';
+-- Grant all privileges on the database ${DB_NAME} to the MySQL user created in the previous statement
+GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'%';
 
 -- Reload MySQL privilege tables to apply changes
 FLUSH PRIVILEGES;
