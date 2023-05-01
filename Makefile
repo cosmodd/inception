@@ -1,35 +1,60 @@
+################################################################################
+# Constants                                                                    #
+################################################################################
+NAME			:=	inception
+
 # Binaries
-DOCKER			=	docker
-DOCKER_COMPOSE	=	docker compose
+DOCKER			:=	docker
+DOCKER_COMPOSE	:=	docker compose
 
 # Paths
-COMPOSE_FILE	=	./srcs/docker-compose.yml
-ENV_FILE		=	./srcs/.env
-DATA_DIR		=	~/data
+COMPOSE_FILE	:=	srcs/docker-compose.yml
+ENV_FILE		:=	srcs/.env
+DATA_DIR		:=	${HOME}/data
 
 # Parameters
-DOCKER_PARAMS	=	-f $(COMPOSE_FILE) --env-file $(ENV_FILE)
+DOCKER_PARAMS	:=	-f $(COMPOSE_FILE) --env-file $(ENV_FILE)
 
+################################################################################
+# Rules                                                                        #
+################################################################################
+# Build the containers if they are not built yet and start them
 all: init-volumes
+	@echo "[+] Starting ${NAME}..."
 	@${DOCKER_COMPOSE} $(DOCKER_PARAMS) up -d
 
+up: all
+
+# Rebuild the containers and start them
 build: init-volumes
+	@echo "[+] Building and starting ${NAME}..."
 	@${DOCKER_COMPOSE} $(DOCKER_PARAMS) up -d --build
 
+# Create the volumes directories if they don't exist
+# -p: create parent directories if needed
 init-volumes:
-	@mkdir -p $(DATA_DIR)/mariadb
-	@mkdir -p $(DATA_DIR)/wordpress
+	@if [ ! -d $(DATA_DIR) ]; then echo "[+] Creating volumes directories..."; fi;
+	@if [ ! -d $(DATA_DIR)/mariadb ]; then mkdir -p $(DATA_DIR)/mariadb; fi;
+	@if [ ! -d $(DATA_DIR)/wordpress ]; then mkdir -p $(DATA_DIR)/wordpress; fi;
 
+# Stops and removes the containers, networks
 down:
+	@echo "[+] Stopping ${NAME}..."
 	@${DOCKER_COMPOSE} $(DOCKER_PARAMS) down
 
+stop: down
+
+# Stops the project, rebuilds the containers and starts them
 re: down build
 
-clean:
-	@${DOCKER} system prune -a
+# Stops the project and removes all unused containers, networks,
+# images and volumes
+# -: ignore errors from commands
+clean: down
+	@echo "[+] Cleaning ${NAME}..."
+	-@${DOCKER} system prune -af
+	@echo "[+] Removing volumes..."
+	-@${DOCKER} volume rm $$(${DOCKER} volume ls -qf dangling=true)
+	@sudo rm -rf $(DATA_DIR)
 
-fclean:
-	@${DOCKER} system prune -a --volumes
-	@rm -rf $(DATA_DIR)
-
-.PHONY: all build down re clean fclean init-volumes
+.PHONY: all up build init-volumes down stop re clean

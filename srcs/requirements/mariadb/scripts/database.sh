@@ -1,9 +1,13 @@
 #!/bin/sh
 
+# If the database is not initialized, initialize it
 if [ ! -d /var/lib/mysql/mysql ]; then
 
 	echo "[INFO] Initializing MariaDB database..."
 
+	# Initialize MariaDB database
+	# --user=mysql: run mysqld as the user mysql
+	# --datadir=/var/lib/mysql: use /var/lib/mysql as the database directory
 	mysql_install_db --user=mysql --datadir=/var/lib/mysql
 
 fi
@@ -17,12 +21,16 @@ if [ ! -d /var/lib/mysql/${DB_NAME} ]; then
 	cp /tmp/wordpress.sql /tmp/wordpress.sql.tmp
 	envsubst < /tmp/wordpress.sql.tmp > /tmp/wordpress.sql
 
-	# --bootstrap is used to execute the SQL commands without starting the server
-	/usr/bin/mysqld --user=mysql --bootstrap < /tmp/wordpress.sql
+	# Initialize Wordpress database
+	# --user=mysql: run mysqld as the user mysql
+	# --bootstrap: run the SQL statements in the file /tmp/wordpress.sql
+	#              without starting a server
+	mysqld --user=mysql --bootstrap < /tmp/wordpress.sql
 
 fi
 
 echo "[INFO] Starting MariaDB..."
 
 # Start MariaDB
-/usr/bin/mysqld --skip-log-error
+# --skip-log-error: don't log errors to the error log
+mysqld --skip-log-error

@@ -2,10 +2,19 @@
 
 echo "Waiting for MariaDB to be ready..."
 
-# Wait for mariadb to be ready
+# Wait for MariaDB container to be ready
+timeout 60 sh -c "
 while ! mysqladmin ping -h $DB_HOST --silent; do
 	sleep 1
-done
+done" 2>/dev/null
+
+# If the container is not ready after 60 seconds, exit
+if [ $? -ne 0 ]; then
+	echo "MariaDB is not ready, exiting..."
+	exit 1
+fi
+
+echo "MariaDB is ready!"
 
 # If wp-config.php doesn't exist, configure wordpress
 if [ ! -e /var/www/wp-config.php ]; then

@@ -6,6 +6,8 @@ RUN apk update && apk upgrade
 RUN apk add --no-cache mariadb mariadb-client gettext
 
 # Setup mysqld
+# Having /var/run/mysqld owned by mysql is a requirement for mysqld to start
+# it is used to store the socket file
 RUN mkdir -p /var/run/mysqld
 RUN chmod 777 /var/run/mysqld
 
@@ -16,10 +18,8 @@ RUN chown mysql /tmp/wordpress.sql
 
 # Setup networking
 RUN sed -i 's/skip-networking/skip-networking=0/g' /etc/my.cnf.d/mariadb-server.cnf
-EXPOSE 3306
 
-RUN mysql_install_db --user=mysql --datadir="/var/lib/mysql"
-
+# Switch to mysql user
 USER mysql
 
 # Entrypoint

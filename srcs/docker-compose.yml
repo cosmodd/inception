@@ -3,8 +3,7 @@ version: '3'
 services:
   nginx:
     container_name: nginx
-    build:
-      context: ./requirements/nginx/
+    build: ./requirements/nginx/
     env_file:
       - ./.env
     ports:
@@ -19,8 +18,7 @@ services:
 
   mariadb:
     container_name: mariadb
-    build:
-      context: ./requirements/mariadb/
+    build: ./requirements/mariadb/
     env_file:
       - ./.env
     restart: unless-stopped
@@ -31,8 +29,7 @@ services:
 
   wordpress:
     container_name: wordpress
-    build:
-      context: ./requirements/wordpress/
+    build: ./requirements/wordpress/
     env_file:
       - ./.env
     restart: unless-stopped
@@ -58,5 +55,6 @@ volumes:
 
 networks:
   inception:
+    name: inception_network
     # Bridge driver allows containers to communicate with each other
     driver: bridge
